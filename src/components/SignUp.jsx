@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Image from '../../public/images/Instagram_icon.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LOGIN } from './Constent';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -11,6 +11,8 @@ const SignUp = () => {
     email: '',
     password: ''
   });
+
+  const navigate = useNavigate()
 
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +25,7 @@ const SignUp = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:3000/auth/register', inputs, {
+      const res = await axios.post(`${URL}/auth/register    `, inputs, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -33,6 +35,11 @@ const SignUp = () => {
         toast.success('Account created successfully!');
         setInputs({ userName: '', email: '', password: '' });
       }
+
+      navigate("/")
+
+
+
     } catch (error) {
       toast.error(error.response?.data?.message || 'Something went wrong');
     } finally {
