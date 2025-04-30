@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SIGNUP, URL } from './Constent';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setAuthUser } from '../redux/userSlice';
 
 const Login = () => {
   const [inputs, setInputs] = useState({
@@ -12,6 +14,8 @@ const Login = () => {
   });
 
   const navigate = useNavigate()
+
+  const dispatch = useDispatch()
 
   const [loading, setLoading] = useState(false);
 
@@ -34,6 +38,8 @@ const Login = () => {
         toast.success('User login successful');
         // Optionally reset form or redirect
       }
+
+      dispatch(setAuthUser(res.data.user))
       navigate("/")
 
       setInputs({

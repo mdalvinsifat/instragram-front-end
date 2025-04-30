@@ -7,19 +7,10 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { LOGIN, URL } from './Constent';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 
 const SideBar = () => {
-  const navItems = [
-    { icon: <FaHome />, label: 'Home' },
-    { icon: <FaSearch />, label: 'Search' },
-    { icon: <FaCompass />, label: 'Explore' },
-    { icon: <FiMessageCircle /> , label: 'Message' },
-    { icon: < CiSquarePlus/> , label: 'Create' },
-    { icon: <FaHeart />, label: 'Notifications' },
-    { icon: <FaUserCircle />, label: 'Profile' },
-    { icon: <LuLogOut />, label: 'LogOut' },
-  ];
 
 
 const navigate = useNavigate()
@@ -38,12 +29,29 @@ const navigate = useNavigate()
     }
   }
 
-
+const {user} = useSelector(store => store.auth)
   const sidebarHandler = (textType) =>{
     if(textType === "LogOut") handleSubmit();
   }
 
   
+  const navItems = [
+    { icon: <FaHome />, label: 'Home' },
+    { icon: <FaSearch />, label: 'Search' },
+    { icon: <FaCompass />, label: 'Explore' },
+    { icon: <FiMessageCircle /> , label: 'Message' },
+    { icon: < CiSquarePlus/> , label: 'Create' },
+    { icon: <FaHeart />, label: 'Notifications' },
+    { icon: 
+      
+      
+      user?.profilePicture ?
+      <img src={user?.profilePicture} alt="" srcset="" className='w-6 h-6 rounded-full' />
+      :
+      <FaUserCircle/>
+      , label: 'Profile' },
+    { icon: <LuLogOut />, label: 'LogOut' },
+  ];
 
   return (
     <>
