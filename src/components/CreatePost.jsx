@@ -1,11 +1,16 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPosts } from '../redux/postSlice';
 
 const CreatePost = ({ open, setOpen }) => {
   const [image, setImage] = useState(null); // for preview
   const [imageFile, setImageFile] = useState(null); // for backend upload
   const [caption, setCaption] = useState('');
+
+  const dispatch = useDispatch()
+  const {posts} = useSelector(store => store.post)
 
   const handleClose = (e) => {
     if (e.target.id === 'backdrop') setOpen(false);
@@ -31,27 +36,22 @@ const CreatePost = ({ open, setOpen }) => {
     formData.append('image', imageFile);
     formData.append('caption', caption);
 
-    // const token = localStorage.getItem('authToken'); // Get the token from localStorage
-
-    // if (!token) {
-    //   toast.error('You must be logged in to create a post');
-    //   return;
-    // }
-
     try {
       const res = await axios.post("http://localhost:3000/post/addPost", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+
         },
         withCredentials:true
       });
 
-  
+      dispatch(setPosts([res.data.post,...posts  ]));
       toast.success(res.data.message || "Post created!");
       setOpen(false);
       setImage(null);
       setImageFile(null);
       setCaption('');
+
     } catch (error) {
       console.error(error);
       toast.error(error?.response?.data?.error || 'Something went wrong');
