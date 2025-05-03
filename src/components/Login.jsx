@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import Image from '../../public/images/Instagram_icon.png';
+import React, { useEffect, useState } from 'react';
+import Image from '../images/Instagram_icon.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { SIGNUP, URL } from './Constent';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setAuthUser } from '../redux/userSlice';
 
 const Login = () => {
@@ -18,7 +18,7 @@ const Login = () => {
   const dispatch = useDispatch()
 
   const [loading, setLoading] = useState(false);
-
+  const {user} = useSelector(store=>store.auth);
   const handleChange = (e) => {
     setInputs({ ...inputs, [e.target.name]: e.target.value });
   };
@@ -31,21 +31,25 @@ const Login = () => {
       const res = await axios.post(`${URL}/auth/login`, inputs, {
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        withCredentials: true
       });
+
+      localStorage.setItem('authToken', res.data.token); // Assuming the token is returned in the response
+
 
       if (res.data.success) {
         toast.success('User login successful');
         // Optionally reset form or redirect
+        dispatch(setAuthUser(res.data.user))
+        navigate("/")
+        
+              setInputs({
+                  email: '',
+            password: ''
+              })
       }
 
-      dispatch(setAuthUser(res.data.user))
-      navigate("/")
-
-      setInputs({
-          email: '',
-    password: ''
-      })
     } catch (error) {
       console.error(error);
       toast.error(error.response?.data?.message || 'Something went wrong');
@@ -53,6 +57,12 @@ const Login = () => {
       setLoading(false);
     }
   };
+
+  useEffect(()=>{
+    if(user){
+        navigate("/");
+    }
+},[])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-100 px-4">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FaInstagram, FaHome  ,FaSearch, FaCompass, FaHeart, FaUserCircle } from 'react-icons/fa';
 import { FiMessageCircle } from "react-icons/fi";
 import { CiSquarePlus } from "react-icons/ci";
@@ -7,12 +7,14 @@ import toast from 'react-hot-toast';
 import axios from 'axios';
 import { LOGIN, URL } from './Constent';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAuthUser } from '../redux/userSlice';
+import CreatePost from './CreatePost';
 
 
 const SideBar = () => {
-
-
+const dispatch = useDispatch()
+const [open , setOpen ] = useState(false)
 const navigate = useNavigate()
   const handleSubmit = async(e)=>{
     try {
@@ -22,6 +24,8 @@ const navigate = useNavigate()
             navigate(`${LOGIN}`)
             toast.success(res.data.message)
         }
+
+        dispatch(setAuthUser(null))
         
     } catch (error) {
         console.log(error)
@@ -29,9 +33,13 @@ const navigate = useNavigate()
     }
   }
 
+
+
 const {user} = useSelector(store => store.auth)
   const sidebarHandler = (textType) =>{
     if(textType === "LogOut") handleSubmit();
+    else if(textType==="Create") setOpen(true)
+
   }
 
   
@@ -52,6 +60,7 @@ const {user} = useSelector(store => store.auth)
       , label: 'Profile' },
     { icon: <LuLogOut />, label: 'LogOut' },
   ];
+
 
   return (
     <>
@@ -82,6 +91,9 @@ const {user} = useSelector(store => store.auth)
           </a>
         ))}
       </div>
+
+
+      <CreatePost open={open}  setOpen={setOpen}/>
     </>
   );
 };

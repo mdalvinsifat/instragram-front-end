@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Image from '../../public/images/Instagram_icon.png';
+import Image from '../images/Instagram_icon.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { LOGIN } from './Constent';
 import toast from 'react-hot-toast';
