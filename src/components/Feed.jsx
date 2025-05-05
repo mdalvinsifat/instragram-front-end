@@ -1,26 +1,107 @@
 import React, { useState } from 'react';
 import { RxBorderDotted } from 'react-icons/rx';
-import { FaRegHeart, FaRegComment, FaRegPaperPlane } from 'react-icons/fa';
+import { FaRegHeart, FaRegComment, FaRegPaperPlane, FaHeart } from 'react-icons/fa';
 import { CiBookmark } from "react-icons/ci";
 import FollowUnFollowDilog from '../Ui/FollowUnFollowDilog';
 import CommantviewDilog from '../Ui/CommantviewDilog';
 import { useSelector } from 'react-redux';
+import { URL } from './Constent';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Feed = () => {
   const [open, setOpen] = useState(false);
   const [commant, setCommant] = useState(false);
   const [text, setText] = useState('');
+  const [selectedPost, setSelectedPost] = useState(null);
   const { posts } = useSelector(store => store.post);
+  const { user } = useSelector(store => store.auth);
+  const [localPosts, setLocalPosts] = useState(posts);
+
+
+  // Initialize like state map
+  const [likesMap, setLikesMap] = useState(() => {
+    const map = {};
+    posts.forEach(post => {
+      map[post._id] = {
+        liked: post.likes.includes(user._id),
+        count: post.likes.length
+      };
+    });
+    return map;
+  });
 
   const handleTextCheck = (e) => {
     const inputText = e.target.value;
     setText(inputText.trim() ? inputText : "");
   };
 
+  const handleOpenDialog = (post) => {
+    setSelectedPost(post);
+    setOpen(true);
+  };
+
+  const likedOrDisLiked = async (postId) => {
+    const postLikeData = likesMap[postId];
+    const currentlyLiked = postLikeData?.liked;
+
+    try {
+      const action = currentlyLiked ? 'dislike' : 'like';
+      const res = await axios.get(`${URL}/post/${postId}/${action}`, { withCredentials: true });
+
+      if (res.data.success) {
+        setLikesMap(prev => ({
+          ...prev,
+          [postId]: {
+            liked: !currentlyLiked,
+            count: currentlyLiked ? prev[postId].count - 1 : prev[postId].count + 1
+          }
+        }));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.error || "Something went wrong");
+    }
+  };
+
+  const commantHandler = async (e, postId) => {
+    e.preventDefault();
+    if (text.trim() === '') return; // Prevent empty comments
+    
+    try {
+      const res = await axios.post(`${URL}/post/${postId}/commant`, { text }, {
+        headers: {
+          'Content-Type': "application/json"
+        },
+        withCredentials: true
+      });
+
+      if (res.data.success) {
+        setText('');
+        toast.success("Comment added successfully");
+      
+        // Update comment count in localPosts
+        setLocalPosts(prev =>
+          prev.map(post =>
+            post._id === postId
+              ? { ...post, comments: [...post.comments, { text }] } // just adding dummy comment
+              : post
+          )
+        );
+      }
+      else {
+        toast.error(res.data.message || "Something went wrong");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.error || "Something went wrong");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 md:px-10 py-10 bg-gray-50 min-h-screen gap-10">
-
-      {posts.map((item, index) => (
+      {posts.map((item) => (
         <div key={item._id} className="w-full max-w-md bg-white rounded-xl shadow-md">
           {/* Header */}
           <div className="flex items-center p-4">
@@ -34,7 +115,7 @@ const Feed = () => {
             </div>
             <div
               className="ml-auto text-xl text-gray-600 cursor-pointer"
-              onClick={() => setOpen(true)}
+              onClick={() => handleOpenDialog(item)}
             >
               <RxBorderDotted />
             </div>
@@ -49,15 +130,31 @@ const Feed = () => {
 
           {/* Action Icons */}
           <div className="flex items-center gap-4 text-xl px-4 py-3 text-gray-800">
-            <FaRegHeart className="cursor-pointer hover:scale-110 transition" />
-            <FaRegComment className="cursor-pointer hover:scale-110 transition" onClick={() => setCommant(true)} />
+            {likesMap[item._id]?.liked ? (
+              <FaHeart
+                size={22}
+                className="cursor-pointer hover:scale-110 transition text-red-600"
+                onClick={() => likedOrDisLiked(item._id)}
+              />
+            ) : (
+              <FaRegHeart
+                size={22}
+                className="cursor-pointer hover:scale-110 transition"
+                onClick={() => likedOrDisLiked(item._id)}
+              />
+            )}
+
+            <FaRegComment
+              className="cursor-pointer hover:scale-110 transition"
+              onClick={() => setCommant(true)}
+            />
             <FaRegPaperPlane className="cursor-pointer hover:scale-110 transition" />
             <CiBookmark className="cursor-pointer hover:scale-110 transition ml-auto" />
           </div>
 
           {/* Likes + Caption */}
           <div className="px-4 pb-3 text-sm">
-            <p className="font-semibold">{item?.likes?.length || 0} likes</p>
+            <p className="font-semibold">{likesMap[item._id]?.count || 0} likes</p>
             <p>
               <span className="font-semibold">{item?.author?.userName}</span> {item?.caption}
             </p>
@@ -68,11 +165,14 @@ const Feed = () => {
             className="px-4 pb-4 text-sm text-gray-500 cursor-pointer"
             onClick={() => setCommant(true)}
           >
-            View all {item?.comments?.length || 0} comments
-          </div>
+View all {Array.isArray(item?.comments) ? item.comments.length : 0} comments
+</div>
 
           {/* Add Comment Section */}
-          <div className="flex items-center px-4 py-3 border-t">
+          <form
+            onSubmit={(e) => commantHandler(e, item._id)}
+            className="flex items-center px-4 py-3 border-t"
+          >
             <input
               type="text"
               className="flex-1 text-sm outline-none placeholder:text-gray-400 p-2"
@@ -85,12 +185,14 @@ const Feed = () => {
                 Post
               </button>
             )}
-          </div>
+          </form>
         </div>
       ))}
 
       {/* Modals */}
-      <FollowUnFollowDilog open={open} setOpen={setOpen} />
+      {open && (
+        <FollowUnFollowDilog open={open} setOpen={setOpen} item={selectedPost} />
+      )}
       <CommantviewDilog commant={commant} setCommant={setCommant} />
     </div>
   );

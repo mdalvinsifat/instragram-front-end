@@ -4,6 +4,7 @@ import { IoClose } from 'react-icons/io5'; // Import a close icon
 import FollowUnFollowDilog from './FollowUnFollowDilog';
 import { FaRegComment, FaRegHeart, FaRegPaperPlane } from 'react-icons/fa';
 import { CiBookmark } from 'react-icons/ci';
+import { useSelector } from 'react-redux';
 
 const CommantviewDilog = ({ commant, setCommant }) => {
   const handleClose = (e) => {
@@ -47,11 +48,11 @@ const CommantviewDilog = ({ commant, setCommant }) => {
 
             {/* Left: Post Image */}
             <div className="flex-1 bg-black flex items-center justify-center overflow-hidden">
-              <img
+              {/* <img
                 src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"
                 alt="Post"
                 className="object-contain w-full max-h-full"
-              />
+              /> */}
             </div>
 
             {/* Right: Comments + User Info */}
