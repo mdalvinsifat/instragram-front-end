@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuthUser } from '../redux/userSlice';
 import CreatePost from './CreatePost';
+import { setPosts, setSelectPost } from '../redux/postSlice';
 
 
 const SideBar = () => {
@@ -19,9 +20,11 @@ const navigate = useNavigate()
   const handleSubmit = async(e)=>{
     try {
         const res = await axios.get(`${URL}/auth/logOut`, {withCredentials:true})
-
         if(res.data.success){
             navigate(`${LOGIN}`)
+            dispatch(setAuthUser(null))
+            dispatch(setPosts([]))
+            dispatch(setSelectPost(null))
             toast.success(res.data.message)
         }
 
