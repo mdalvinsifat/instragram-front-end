@@ -139,13 +139,20 @@ const Feed = () => {
             <p><span className="font-semibold">{item.author.userName}</span> {item.caption}</p>
           </div>
 
-          <div className="px-4 pb-4 text-sm text-gray-500 cursor-pointer" onClick={() => {
-            setSelectedPost(item);
-            setCommant(true);
-            dispatch(setSelectPost(item))
-          }}>
-            View all {item.comments.length || 0} comments
-          </div>
+
+{
+
+item.comments.length > 0 &&
+
+<div className="px-4 pb-4 text-sm text-gray-500 cursor-pointer" onClick={() => {
+  setSelectedPost(item);
+  setCommant(true);
+  dispatch(setSelectPost(item))
+}}>
+  View all {item.comments.length } comments
+</div>
+
+}
 
           <form onSubmit={(e) => commantHandler(e, item._id)} className="flex items-center px-4 py-3 border-t">
             <input

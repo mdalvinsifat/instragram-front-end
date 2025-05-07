@@ -2,27 +2,31 @@
 import axios from 'axios';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { setPosts } from '../redux/postSlice';
 import { URL } from '../components/Constent';
+import { ViewProfile as setViewProfile } from '../redux/userSlice'; // rename to avoid conflict
 
-const useGetAllPost = () => {
+const ViewProfile = (id) => {
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     const fetchGetAllPost = async () => {
       try {
-        const res = await axios.get(`${URL}/post/allpost`, {withCredentials:true});
+        const res = await axios.get(`${URL}/post/${id}/profile`, {
+          withCredentials: true,
+        });
         if (res.data.success) {
-          dispatch(setPosts(res.data.posts));
+          dispatch(setViewProfile(res.data.posts));
         }
-        
+        console.log(res);
       } catch (error) {
         console.error('Failed to fetch posts:', error);
       }
     };
 
-    fetchGetAllPost();
-  }, []);
+    if (id) {
+      fetchGetAllPost();
+    }
+  }, [dispatch, id]);
 };
 
-export default useGetAllPost;
+export default ViewProfile;
