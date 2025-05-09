@@ -17,6 +17,10 @@ import ChatApp from './ChatApp';
 const ChatSideBar = () => {
 const dispatch = useDispatch()
 const [open , setOpen ] = useState(false)
+  const {likeNotification} = useSelector(store => store.likeNotification)
+  const [showNotifications, setShowNotifications] = useState(false);
+
+
 const navigate = useNavigate()
   const handleSubmit = async(e)=>{
     try {
@@ -74,49 +78,111 @@ const {user} = useSelector(store => store.auth)
 
 
 
-      <div className="flex min-h-screen bg-gray-50">
-        
-        <div className="hidden md:flex flex-col justify-between w-20 h-screen px-2 py-8 bg-white border-r text-black fixed">
-        {/* Logo */}
-        <div className="flex items-center justify-center  mb-8">
+ <div className="flex min-h-screen bg-gray-50">
+  {/* Sidebar for md+ screens */}
+  <div className="hidden md:flex flex-col  w-20  h-screen px-2 py-8 bg-white border-r text-black fixed">
+    {/* Logo */}
+    <div className="flex items-center justify-center mb-8">
+      <FaInstagram className="w-8 h-8 text-pink-500" />
+    </div>
 
-          <span className="hidden lg:inline ml-2 text-2xl font-semibold text-gray-800 dark:text-white">
-          <FaInstagram className="w-8 h-8 text-pink-500" />
-          </span>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex flex-col space-y-6 mb-100">
-          {navItems.map((item, index) => (
-            <a key={index} onClick={() => sidebarHandler(item.label)} href="#" className="flex items-center hover:bg-gray-200 text-black fs hover:bg-white-800 px-4 py-2 rounded-lg">
-              <span className="text-xl font-extrabold" >{item.icon}</span>
-            </a>
-          ))}
-        </nav>
-      </div>
-
-      {/* Bottom navbar for small screens */}
-      <div className="fixed bottom-0 left-0 right-0 md:hidden flex justify-around items-center bg-white dark:bg-gray-900 border-t py-2 z-50">
-        {navItems.map((item, index) => (
-          <a key={index} href="#"   onClick={() => sidebarHandler(item.label)} className="flex flex-col items-center text-gray-600 dark:text-gray-300">
+    {/* Navigation */}
+    <nav className="flex flex-col space-y-6">
+      {navItems.map((item, index) => {
+        const isNotification = item.label === "Notifications";
+        return (
+          <a
+            key={index}
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (isNotification) {
+                setShowNotifications(!showNotifications);
+              }
+              sidebarHandler(item.label);
+            }}
+            className="flex items-center relative hover:bg-gray-200 text-black px-4 py-2 rounded-lg"
+          >
             <span className="text-xl">{item.icon}</span>
+
+            {isNotification && likeNotification.length > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 text-xs bg-red-500 text-white px-1.5 py-0.5 rounded-full">
+                {likeNotification.length}
+              </span>
+            )}
+
+            {/* Notification dropdown */}
+            {isNotification && showNotifications && (
+              <div className="absolute left-full top-0 ml-2 mt-2 z-20 w-64 bg-white border shadow-md rounded-lg overflow-hidden">
+                {likeNotification.length === 0 ? (
+                  <p className="p-4 text-gray-600">No Notifications</p>
+                ) : (
+                  <ul className="max-h-64 overflow-y-auto">
+                    {likeNotification.map((notification, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-center px-4 py-2 hover:bg-gray-100"
+                      >
+                        <img
+                          src={notification.userDetails?.profilePicture}
+                          alt="Profile"
+                          className="w-8 h-8 rounded-full mr-3"
+                        />
+                        <span className="text-sm font-medium">
+                          {notification.userDetails?.userName} liked your post
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </a>
-        ))}
-      </div>
+        );
+      })}
+    </nav>
+  </div>
+
+  {/* Bottom Nav for small screens */}
+  <div className="md:hidden fixed bottom-0 left-0 right-0 flex justify-around items-center bg-white border-t py-2 z-50">
+   
+   {navItems.map((item, index) => {
+  const isNotification = item.label === "Notifications";
+  return (
+    <a
+      key={index}
+      href="#"
+      onClick={(e) => {
+        e.preventDefault();
+        sidebarHandler(item.label);
+      }}
+      className="relative flex flex-col items-center text-gray-700"
+    >
+  <span className="relative text-xl">
+  {item.icon}
+  {isNotification && likeNotification.length > 0 && (
+    <span className="absolute -top-1 -right-1 text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full leading-none">
+      {likeNotification.length}
+    </span>
+  )}
+</span>
+    </a>
+  );
+})}
 
 
-      <CreatePost open={open}  setOpen={setOpen}/>
 
+  </div>
 
-            {/* Main Content */}
-            <div className="flex-grow md:ml-20 lg:ml-64 lg:mr-64 px-2 sm:px-4 py-4">
-          <ChatApp/>
-                    
-         
-            </div>
+  {/* Modal */}
+  <CreatePost open={open} setOpen={setOpen} />
 
-          
-        </div>
+  {/* Main Content */}
+  <div className="flex-grow pt-4 px-2 sm:px-4 md:ml-20 lg:ml-64 lg:mr-64">
+    <ChatApp />
+  </div>
+</div>
+
 
 
 

@@ -12,6 +12,7 @@ const ChatApp = () => {
   const { user, suggestedUsers, selectedUser } = useSelector((store) => store.auth);
   const { onlineUsers, messages } = useSelector((store) => store.chat);
   const dispatch = useDispatch();
+  const [isUserListVisible, setIsUserListVisible] = useState(true); // Add state to control visibility
   const isOnline = true; // Simulating online status for now
 
   // Send message handler
@@ -40,9 +41,14 @@ const ChatApp = () => {
     };
   }, [dispatch]);
 
+  const handleBackButton = () => {
+    dispatch(setSelectedUser(null)); // Reset selected user
+    setIsUserListVisible(true); // Show user list again
+  };
+
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
-      {/* Sidebar */}
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-100 md:flex-row">
+      {/* Sidebar - Only visible on larger screens */}
       <aside className="hidden md:flex flex-col w-72 bg-white border-r p-4 shadow-sm">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Chats</h2>
         <div className="space-y-3 overflow-y-auto h-full pr-1">
@@ -50,7 +56,10 @@ const ChatApp = () => {
             <div
               key={suggested._id}
               className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer"
-              onClick={() => dispatch(setSelectedUser(suggested))}
+              onClick={() => {
+                dispatch(setSelectedUser(suggested));
+                setIsUserListVisible(false); // Hide the user list when a user is selected
+              }}
             >
               <img
                 src={suggested?.profilePicture || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
@@ -72,17 +81,53 @@ const ChatApp = () => {
       <main className="flex-1 flex flex-col">
         {/* Header */}
         <header className="flex items-center justify-between px-6 py-4 border-b bg-white shadow-sm">
-          <h1 className="text-xl font-semibold text-gray-700">
-            Welcome, <span className="text-blue-600">{user?.userName || 'Guest'}</span>
-          </h1>
+          {selectedUser ? (
+            <button
+              onClick={handleBackButton}
+              className="text-blue-600 hover:text-blue-800"
+            >
+              Back to Users
+            </button>
+          ) : (
+            <h1 className="text-xl font-semibold text-gray-700">
+              Welcome, <span className="text-blue-600">{user?.userName || 'Guest'}</span>
+            </h1>
+          )}
         </header>
 
         {/* Chat Area */}
-        <section className="flex-1 p-6 overflow-y-auto">
+        <section className="flex-1 p-6 overflow-y-auto flex flex-col md:flex-row">
+          {/* User List (Mobile View) */}
+          <div className={`md:hidden flex flex-col w-full mb-4 ${isUserListVisible ? '' : 'hidden'}`}>
+            {suggestedUsers?.map((suggested) => (
+              <div
+                key={suggested._id}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer"
+                onClick={() => {
+                  dispatch(setSelectedUser(suggested));
+                  setIsUserListVisible(false); // Hide the user list when a user is selected
+                }}
+              >
+                <img
+                  src={suggested?.profilePicture || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
+                  alt={suggested.userName}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div>
+                  <p className="font-medium text-gray-800">{suggested.userName}</p>
+                  <p className={`text-xs font-bold ${isOnline ? 'text-green-600' : 'text-red-600'}`}>
+                    {isOnline ? 'Online' : 'Offline'}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Chat with selected user */}
           {selectedUser ? (
-            <div className="w-full max-w-2xl mx-auto flex flex-col h-[calc(100vh-130px)]">
+            <div className="flex-1 flex flex-col w-full max-w-2xl mx-auto">
               {/* Message List */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto mb-4">
                 <Message selectedUser={selectedUser} />
               </div>
 
@@ -111,24 +156,6 @@ const ChatApp = () => {
           )}
         </section>
       </main>
-
-      {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 md:hidden flex justify-around items-center bg-white border-t py-3 shadow-md z-50">
-        {suggestedUsers?.slice(0, 4).map((suggested) => (
-          <button
-            key={suggested._id}
-            className="flex flex-col items-center text-gray-600 text-xs"
-            onClick={() => dispatch(setSelectedUser(suggested))}
-          >
-            <img
-              src={suggested?.profilePicture || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}
-              alt={suggested.userName}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <span>{suggested.userName}</span>
-          </button>
-        ))}
-      </nav>
     </div>
   );
 };

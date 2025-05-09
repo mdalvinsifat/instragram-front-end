@@ -30,7 +30,7 @@ const rootReducer = combineReducers({
     post : postSlice, 
     socket: socketSlice, 
     chat : chatSlice, 
-    rtn : rtnSlice 
+    likeNotification : rtnSlice 
 })
 
   const persistedReducer = persistReducer(persistConfig, rootReducer)

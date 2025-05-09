@@ -106,6 +106,18 @@ const Feed = () => {
     }
   };
 
+     const bookmarkHandler = async () => {
+        try {
+            const res = await axios.get(`${URL}/post/${postId?._id}/bookmark`, {withCredentials:true});
+            if(res.data.success){
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
   return (
     <div className="flex flex-col items-center px-4 sm:px-6 md:px-10 py-10 bg-gray-50 min-h-screen gap-10">
       {posts.map((item) => (
@@ -131,7 +143,7 @@ const Feed = () => {
               setCommant(true);
             }} />
             <FaRegPaperPlane className="cursor-pointer hover:scale-110 transition" />
-            <CiBookmark className="ml-auto cursor-pointer hover:scale-110 transition" />
+            <CiBookmark onClick={bookmarkHandler} className="ml-auto cursor-pointer hover:scale-110 transition" />
           </div>
 
           <div className="px-4 pb-3 text-sm">

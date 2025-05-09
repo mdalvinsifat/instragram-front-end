@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import useGetAllMessage from '../hooks/useGetAllMessage';
+import useGetRTM from '../hooks/useGetRTM';
 
 const Message = () => {
   const [loading, setLoading] = useState(true);
@@ -8,6 +9,7 @@ const Message = () => {
   const { user } = useSelector((store) => store.auth);
 
   useGetAllMessage();
+    useGetRTM();
 
   useEffect(() => {
     if (messages) {

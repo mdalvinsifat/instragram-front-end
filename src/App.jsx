@@ -11,6 +11,9 @@ import { io } from "socket.io-client";
 import { setSocket } from './redux/socketSlice';
 import { setOnlineUsers } from './redux/chatSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { setLikeNotification } from './redux/rtnSlice';
+import ProtectedRoutes from './components/ProtectedRoutes';
+import NotFound from './components/NotFound';
 const App = () => {
   const { user } = useSelector(store => store.auth);
 const { socket } = useSelector(store => store.socket);
@@ -35,11 +38,11 @@ useEffect(() =>{
       });
 
       socketio.on('notification', (notification) => {
-        dispatch(setLikeNotification (notification));
+        dispatch(setLikeNotification(notification));
       });
 
   
-      return () => {
+      return () => {  
         socketio.close();
         dispatch(setSocket(null));
       }
@@ -55,13 +58,18 @@ useEffect(() =>{
   return (
     <div>
 <Routes>
-  <Route path={SIGNUP} element={<SignUp/>}/>
-  <Route path={LOGIN} element={<Login/>}/>
-  <Route path="/" element={<Home/>}/>
-  <Route path='/:id/profile' element={<Profile/>}/>
-  <Route path='/account/edit' element={<EditSidebar/>}/>
-  <Route path='/chat' element={<ChatSideBar/>}/>
+  <Route path={SIGNUP} element={<SignUp />} />
+  <Route path={LOGIN} element={<Login />} />
+  <Route path="*" element={<NotFound />} />
+
+  <Route element={<ProtectedRoutes />}>
+    <Route path="/" element={<Home />} />
+    <Route path="/:id/profile" element={<Profile />} />
+    <Route path="/account/edit" element={<EditSidebar />} />
+    <Route path="/chat" element={<ChatSideBar />} />
+  </Route>
 </Routes>
+
 
     </div>
   );
