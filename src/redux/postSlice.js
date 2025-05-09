@@ -13,7 +13,7 @@ const postSlice = createSlice({
         setSelectPost:(state,action) => {
             state.setSelectPost = action.payload;
         }
-    }
+    }   
 });
 export const {setPosts, setSelectPost} = postSlice.actions;
 export default postSlice.reducer;

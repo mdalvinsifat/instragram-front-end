@@ -8,9 +8,10 @@ const UseSuggested = () => {
     return (
         <div>
             {
-                suggestedUsers.slice(0, 3).map((item, index) => (
+                suggestedUsers.map((item, index) => (
                     <div className="flex items-center mb-4" key={index}>
-                        <div>
+                      <Link to={`${item._id}/profile`}>
+                      <div>
                             <img
                                 src={item?.profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
                                 alt="Profile"
@@ -18,6 +19,7 @@ const UseSuggested = () => {
                             />
                         </div>
 
+                      </Link>
                         <div className="ml-3 mt-2">
                             <p className="text-sm">{item?.userName}</p>
                         </div>

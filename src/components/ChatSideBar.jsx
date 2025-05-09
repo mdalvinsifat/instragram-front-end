@@ -11,9 +11,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setAuthUser } from '../redux/userSlice';
 import CreatePost from './CreatePost';
 import { setPosts, setSelectPost } from '../redux/postSlice';
+import image from "../images/Instagram_icon.png"
+import ChatApp from './ChatApp';
 
-
-const SideBar = () => {
+const ChatSideBar = () => {
 const dispatch = useDispatch()
 const [open , setOpen ] = useState(false)
 const navigate = useNavigate()
@@ -70,13 +71,18 @@ const {user} = useSelector(store => store.auth)
 
 
   return (
-    <>
-      {/* Sidebar for medium and large screens */}
-      <div className="hidden md:flex flex-col justify-between w-20 lg:w-64 h-screen px-2 py-8 bg-white border-r text-black fixed">
+
+
+
+      <div className="flex min-h-screen bg-gray-50">
+        
+        <div className="hidden md:flex flex-col justify-between w-20 h-screen px-2 py-8 bg-white border-r text-black fixed">
         {/* Logo */}
         <div className="flex items-center justify-center  mb-8">
+
+          <span className="hidden lg:inline ml-2 text-2xl font-semibold text-gray-800 dark:text-white">
           <FaInstagram className="w-8 h-8 text-pink-500" />
-          <span className="hidden lg:inline ml-2 text-2xl font-semibold text-gray-800 dark:text-white">Instagram</span>
+          </span>
         </div>
 
         {/* Navigation */}
@@ -84,7 +90,6 @@ const {user} = useSelector(store => store.auth)
           {navItems.map((item, index) => (
             <a key={index} onClick={() => sidebarHandler(item.label)} href="#" className="flex items-center hover:bg-gray-200 text-black fs hover:bg-white-800 px-4 py-2 rounded-lg">
               <span className="text-xl font-extrabold" >{item.icon}</span>
-              <span className="hidden lg:inline ml-3">{item.label}</span>
             </a>
           ))}
         </nav>
@@ -101,8 +106,23 @@ const {user} = useSelector(store => store.auth)
 
 
       <CreatePost open={open}  setOpen={setOpen}/>
-    </>
+
+
+            {/* Main Content */}
+            <div className="flex-grow md:ml-20 lg:ml-64 lg:mr-64 px-2 sm:px-4 py-4">
+          <ChatApp/>
+                    
+         
+            </div>
+
+          
+        </div>
+
+
+
+
+   
   );
 };
 
-export default SideBar;
+export default ChatSideBar;

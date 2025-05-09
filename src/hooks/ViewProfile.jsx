@@ -1,32 +1,42 @@
-// src/hooks/useGetAllPost.js
 import axios from 'axios';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { URL } from '../components/Constent';
-import { ViewProfile as setViewProfile } from '../redux/userSlice'; // rename to avoid conflict
+import { setViewProfile } from '../redux/userSlice';
+import { useParams } from 'react-router-dom';
+import ViewAdminProfile from '../components/ViewAdminProfile';
 
-const ViewProfile = (id) => {
+const ProfileView = () => {
   const dispatch = useDispatch();
+  const { id: userId } = useParams(); // get `id` from URL and rename to userId
+
+  const fetchViewProfile = async () => {
+    try {
+      const res = await axios.get(`${URL}/auth/${userId}/profile`, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        dispatch(setViewProfile(res.data.user));
+      
+      }
+      console.log(res.data.success)
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchGetAllPost = async () => {
-      try {
-        const res = await axios.get(`${URL}/post/${id}/profile`, {
-          withCredentials: true,
-        });
-        if (res.data.success) {
-          dispatch(setViewProfile(res.data.posts));
-        }
-        console.log(res);
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
-      }
-    };
-
-    if (id) {
-      fetchGetAllPost();
+    if (userId) {
+      fetchViewProfile();
     }
-  }, [dispatch, id]);
+  }, [userId]);
+
+  return (
+    <div>
+<ViewAdminProfile/>
+    </div>
+  );
 };
 
-export default ViewProfile;
+export default ProfileView;
