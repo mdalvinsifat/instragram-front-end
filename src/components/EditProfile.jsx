@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setAuthUser } from '../redux/userSlice';
 import toast from 'react-hot-toast';
+import { URL } from './Constent';
 
 const EditProfile = () => {
   const imageRef = useRef();
@@ -42,7 +43,7 @@ const EditProfile = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post(`http://localhost:3000/auth/edit`, formData, {
+      const res = await axios.post(`${URL}/auth/edit`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

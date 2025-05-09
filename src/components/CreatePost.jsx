@@ -24,7 +24,7 @@ const CreatePost = ({ open, setOpen }) => {
     }
   };
 
- 
+
   const HandlePostSubmite = async (e) => {
     e.preventDefault();
     if (!imageFile || !caption) {
@@ -35,11 +35,15 @@ const CreatePost = ({ open, setOpen }) => {
     const formData = new FormData();
     formData.append('image', imageFile);
     formData.append('caption', caption);
+     const token = localStorage.getItem('token'); // or wherever you store your token
+
 
     try {
-      const res = await axios.post("http://localhost:3000/post/addPost", formData, {
+      const res = await axios.post("https://instragram-back-end-p.onrender.com/post/addPost", formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`,
+
 
         },
         withCredentials:true
