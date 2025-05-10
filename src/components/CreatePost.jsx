@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { setPosts } from '../redux/postSlice';
+import { URLS } from './Constent';
 
 const CreatePost = ({ open, setOpen }) => {
   const [image, setImage] = useState(null); // for preview
@@ -39,7 +40,7 @@ const CreatePost = ({ open, setOpen }) => {
 
 
     try {
-      const res = await axios.post("https://instragram-back-end-p.onrender.com/post/addPost", formData, {
+      const res = await axios.post(`${URLS}/post/addPost`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`,
