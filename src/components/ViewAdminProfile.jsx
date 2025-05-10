@@ -114,11 +114,18 @@ const ViewAdminProfile = () => {
             className="relative group aspect-square overflow-hidden rounded-md cursor-pointer"
           >
             {/* Post Image */}
-            <img
-              src={item.image}
-              alt={`Post ${index + 1}`}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-            />
+     {item?.image ? (
+  <img
+    src={item.image}
+    alt={`Post ${index + 1}`}
+    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+  />
+) : (
+  <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+    No Image
+  </div>
+)}
+
 
             {/* Hover Overlay */}
             <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center gap-8 opacity-0 group-hover:opacity-30 transition-opacity duration-300">
