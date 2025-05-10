@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 const ViewAdminProfile = () => {
   const viewProfile = useSelector((store) => store.auth.ViewProfile);
 
-  console.log(viewProfile.image)
   const { posts } = useSelector((store) => store.post);
   const { user } = useSelector((store) => store.auth);
 
