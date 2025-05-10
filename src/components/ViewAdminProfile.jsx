@@ -115,7 +115,7 @@ const ViewAdminProfile = () => {
           >
             {/* Post Image */}
             <img
-              src={item?.image}
+              src={item.image}
               alt={`Post ${index + 1}`}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
             />
